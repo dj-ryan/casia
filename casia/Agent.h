@@ -1,6 +1,8 @@
 #pragma once
-class Agent
-{
+#ifndef AGENT_H
+#define AGENT_H
+
+class Agent {
 private:
     int id;               // unique identifier
     int currentLocation;  // current location
@@ -9,43 +11,24 @@ private:
 
 public:
     // Constructor
-    Agent(int agentId, int initialLocation, int initialCredit)
-        : id(agentId), currentLocation(initialLocation), targetLocation(0), credit(initialCredit) {}
+    Agent();
+    Agent(int agentId, int initialLocation, int initialCredit);
 
     // Getter functions
-    int getId() const {
-        return id;
-    }
-
-    int getCurrentLocation() const {
-        return currentLocation;
-    }
-
-    int getTargetLocation() const {
-        return targetLocation;
-    }
-
-    int getCredit() const {
-        return credit;
-    }
+    int getId() const;
+    int getCurrentLocation() const;
+    int getTargetLocation() const;
+    int getCredit() const;
 
     // Setter functions
-    void setCurrentLocation(int location) {
-        currentLocation = location;
-    }
-
-    void setTargetLocation(int target) {
-        targetLocation = target;
-    }
-
-    void setCredit(int newCredit) {
-        credit = newCredit;
-    }
+    void setCurrentLocation(int location);
+    void setTargetLocation(int target);
+    void setCredit(int newCredit);
 
     // Display information
-    void displayInfo() const {
-        std::cout << "Agent ID: " << id << "\nCurrent Location: " << currentLocation
-            << "\nTarget Location: " << targetLocation << "\nTotal Social Credit: " << credit << "\n";
-    }
+    void displayInfo() const;
 };
+
+#endif // AGENT_H
+
 
