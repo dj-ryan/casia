@@ -48,46 +48,48 @@ void simulateIteration(Agent agents[], int numAgents) {
             else {
                 break;
             }
+
+
+
         }
 
-        // 
+        // agentsInSameLocation.size() > 1
         if (agentsInSameLocation.size() > 1) {
             // If there are multiple agents in the same location determin which has the highest social credit score
             int maxCredit = agentsInSameLocation[0].getCredit();
             int maxCreditIndex = 0;
-            for (int k = 1; k < agentsInSameLocation.size(); ++k) {
+            for (int k = 1; k < agentsInSameLocation.size(); k++) {
                 if (agentsInSameLocation[k].getCredit() > maxCredit) {
                     maxCredit = agentsInSameLocation[k].getCredit();
                     maxCreditIndex = k;
                 }
             }
 
-            // Move the agent with the highest social credit score towards its target location
-            if (agentsInSameLocation[maxCreditIndex].getCurrentLocation() != agentsInSameLocation[maxCreditIndex].getTargetLocation()) {
-                if (agentsInSameLocation[maxCreditIndex].getTargetLocation() > agentsInSameLocation[maxCreditIndex].getCurrentLocation()) {
-                    agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() + 1);
-                }
-                else {
-                    agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() - 1);
-                }
-            }
+     //       // Move the agent with the highest social credit score towards its target location
+     //       if (agentsInSameLocation[maxCreditIndex].getCurrentLocation() != agentsInSameLocation[maxCreditIndex].getTargetLocation()) {
+     //           if (agentsInSameLocation[maxCreditIndex].getTargetLocation() > agentsInSameLocation[maxCreditIndex].getCurrentLocation()) {
+					//agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() + 1);
+     //           }
+     //           else {
+     //               agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() - 1);
+     //           }
+     //       }
 
-            // Update the social credit score of the agent that moved
-            //agentsInSameLocation[maxCreditIndex].setCredit(agentsInSameLocation[maxCreditIndex].getCredit() - 1);
+     //       // Update the social credit score of the agent that moved
+     //       //agentsInSameLocation[maxCreditIndex].setCredit(agentsInSameLocation[maxCreditIndex].getCredit() - 1);
 
-            // Update the social credit score of the other agents in the same location
-            for (int k = 0; k < agentsInSameLocation.size(); ++k) {
-                if (k != maxCreditIndex) {
-                    agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() + 1); // Update the social credit score of the agent that did not move
-                }
-                else {
-                    agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() - 1); // Update the social credit score of the agent that moved
-                }
-            }
+     //       // Update the social credit score of the other agents in the same location
+     //       for (int k = 0; k < agentsInSameLocation.size(); ++k) {
+     //           if (k != maxCreditIndex) {
+     //               agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() + 1); // Update the social credit score of the agent that did not move
+     //           }
+     //           else {
+     //               agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() - 1); // Update the social credit score of the agent that moved
+     //           }
+     //       }
 
 
-        }
-        else {
+        }  else {
             // If there is only one agent in the location, move the agent towards its target location
             if (agents[i].getCurrentLocation() != agents[i].getTargetLocation()) {
                 if (agents[i].getTargetLocation() > agents[i].getCurrentLocation()) {
@@ -126,11 +128,12 @@ int main() {
         std::cout << "----------------------\n";
     }
 
+    bool allReachedTarget = false;
 
     // Main loop
-    while (true) {
+    while (!allReachedTarget) {
         // Check if all agents reached their target locations
-        bool allReachedTarget = true;
+        allReachedTarget = true;
         for (int i = 0; i < numAgents; ++i) {
             if (agents[i].getCurrentLocation() != agents[i].getTargetLocation()) {
                 allReachedTarget = false;
@@ -146,10 +149,6 @@ int main() {
         else {
             itterationCounter++;
             std::cout << "Not all agents reached their target locations. Simulation continues. Itteration:\n" << itterationCounter;
-        }
-
-        // Simulate one iteration of the main loop
-        if (!allReachedTarget) {
             simulateIteration(agents, numAgents);
         }
 

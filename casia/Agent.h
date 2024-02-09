@@ -4,10 +4,11 @@
 
 class Agent {
 private:
-    int id;               // unique identifier
-    int currentLocation;  // current location
-    int targetLocation;   // location the agent wants to go
-    int credit;           // total social credit
+    uint8_t id;               // unique identifier
+    uint8_t currentLocation;  // current location
+    uint8_t targetLocation;   // location the agent wants to go
+    char locationMap[101];			  // map of the world
+    uint8_t credit;           // total social credit
 
 public:
     // Constructor
@@ -18,11 +19,13 @@ public:
     int getId() const;
     int getCurrentLocation() const;
     int getTargetLocation() const;
+    char* getLocationMap() const;
     int getCredit() const;
 
     // Setter functions
     void setCurrentLocation(int location);
     void setTargetLocation(int target);
+    void setLocationMap(char* map);
     void setCredit(int newCredit);
 
     // Display information
