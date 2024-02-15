@@ -125,7 +125,7 @@ int main() {
     // Display information for each agent
     for (int i = 0; i < numAgents; ++i) {
         agents[i].displayInfo();
-        std::cout << "----------------------\n";
+        std::cout << "++++++++++++++++++++\n";
     }
 
     bool allReachedTarget = false;
