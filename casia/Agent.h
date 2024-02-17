@@ -3,7 +3,7 @@
 #define AGENT_H
 
 
-#define MAP_SIZE 101
+#define MAP_SIZE 100
 
 
 class Agent {

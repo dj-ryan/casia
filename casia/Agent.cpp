@@ -2,11 +2,11 @@
 #include <iostream>
 
 //default constructor
-Agent::Agent() : id(0), currentLocation(0), locationMap("---------------------------------------------------------------------------------------------------\n"), targetLocation(0), credit(0) {}
+Agent::Agent() : id(0), currentLocation(0), locationMap("---------------------------------------------------------------------------------------------------"), targetLocation(0), credit(0) {}
 
 // Constructor
 Agent::Agent(int agentId, int initialLocation, int initialCredit)
-    : id(agentId), currentLocation(initialLocation), targetLocation(0), locationMap("---------------------------------------------------------------------------------------------------\n"), credit(initialCredit) {}
+    : id(agentId), currentLocation(initialLocation), targetLocation(0), locationMap("---------------------------------------------------------------------------------------------------"), credit(initialCredit) {}
 
 // Getter functions
 int Agent::getId() const {
