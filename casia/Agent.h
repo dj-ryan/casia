@@ -11,7 +11,6 @@ private:
     int id;               // unique identifier
     int currentLocation;  // current location
     int targetLocation;   // location the agent wants to go
-    char locationMap[MAP_SIZE];			  // map of the world
     int credit;           // total social credit
 
 public:
