@@ -84,14 +84,18 @@ void simulateIteration(Agent agents[], int numAgents) {
 			// move the agent with the highest social credit closer to its target
 			if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() < agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
 				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1);
-				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1, agentsAtLocation[i][maxCreditIndex].getCredit());
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1, agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " moved to " << agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1 << std::endl;
 			}
 			else if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() > agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
 				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1);
-				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1, agentsAtLocation[i][maxCreditIndex].getCredit());
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1, agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " moved to " << agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1 << std::endl;
 			}
 			else {
 				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " is at its target location" << std::endl;
+				// update the credit score to 0
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation(), 0);
 			}
 
 			// update the credit of the agents that are not moving
@@ -99,12 +103,10 @@ void simulateIteration(Agent agents[], int numAgents) {
 				if (j != maxCreditIndex) {
 					//agentsAtLocation[i][j].setCredit(agentsAtLocation[i][j].getCredit() - 1);
 					updateAgentById(agents, numAgents, agentsAtLocation[i][j].getId(), agentsAtLocation[i][j].getCurrentLocation(), agentsAtLocation[i][j].getCredit() + 1);
+					std::cout << "Agent " << agentsAtLocation[i][j].getId() << " is waiting" << std::endl;
 				}
 			}
 
-			// update the credit of the agent that is moving
-			//agentsAtLocation[i][maxCreditIndex].setCredit(agentsAtLocation[i][maxCreditIndex].getCredit() + 1);
-			updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation(), agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
 		}
 		else if (agentsAtLocation[i].size() == 1) {
 			// move the agent one step closer to the target
@@ -112,20 +114,22 @@ void simulateIteration(Agent agents[], int numAgents) {
 				
 				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() + 1);
 				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() + 1, agentsAtLocation[i][0].getCredit());
-				std::cout << "Moved " << agentsAtLocation[i][0].getId() << " to " << agentsAtLocation[i][0].getCurrentLocation() + 1 << std::endl;
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " moved to " << agentsAtLocation[i][0].getCurrentLocation() + 1 << std::endl;
 			}
 			else if (agentsAtLocation[i][0].getCurrentLocation() > agentsAtLocation[i][0].getTargetLocation()) {
 				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() - 1);
 				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() - 1, agentsAtLocation[i][0].getCredit());
-				std::cout << "Moved " << agentsAtLocation[i][0].getId() << " to " << agentsAtLocation[i][0].getCurrentLocation() - 1 << std::endl;
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " moved to " << agentsAtLocation[i][0].getCurrentLocation() - 1 << std::endl;
 			}
 			else {
 				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " is at its target location" << std::endl;
+				// update the credit score to 0	
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation(), 0);
 			}
 
 		}
 		else {
-			// do nothing
+			// do nothing this is an empty location
 		}
 	}
 
