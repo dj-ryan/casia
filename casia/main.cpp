@@ -31,6 +31,17 @@ void initAgents(Agent agents[], int numAgents) {
 	}
 }
 
+void updateAgentById(Agent agents[], int numAgents, int id, int newLocation, int newCredit) {
+	for (int i = 0; i < numAgents; i++) {
+		if (agents[i].getId() == id) {
+			agents[i].setCurrentLocation(newLocation);
+			agents[i].setCredit(newCredit);
+			break;
+		}
+	}
+}
+
+
 void simulateIteration(Agent agents[], int numAgents) {
 
 	//Make a vector of vecotrs to store the agents that are at each location
@@ -68,24 +79,48 @@ void simulateIteration(Agent agents[], int numAgents) {
 					maxCreditIndex = j;
 				}
 			}
+
+
 			// move the agent with the highest social credit closer to its target
 			if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() < agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
-				agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1);
+				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1, agentsAtLocation[i][maxCreditIndex].getCredit());
 			}
 			else if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() > agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
-				agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1);
+				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1, agentsAtLocation[i][maxCreditIndex].getCredit());
 			}
+			else {
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " is at its target location" << std::endl;
+			}
+
+			// update the credit of the agents that are not moving
+			for (int j = 0; j < agentsAtLocation[i].size(); j++) {
+				if (j != maxCreditIndex) {
+					//agentsAtLocation[i][j].setCredit(agentsAtLocation[i][j].getCredit() - 1);
+					updateAgentById(agents, numAgents, agentsAtLocation[i][j].getId(), agentsAtLocation[i][j].getCurrentLocation(), agentsAtLocation[i][j].getCredit() + 1);
+				}
+			}
+
+			// update the credit of the agent that is moving
+			//agentsAtLocation[i][maxCreditIndex].setCredit(agentsAtLocation[i][maxCreditIndex].getCredit() + 1);
+			updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation(), agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
 		}
 		else if (agentsAtLocation[i].size() == 1) {
 			// move the agent one step closer to the target
 			if (agentsAtLocation[i][0].getCurrentLocation() < agentsAtLocation[i][0].getTargetLocation()) {
 				
-				agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() + 1);
+				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() + 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() + 1, agentsAtLocation[i][0].getCredit());
 				std::cout << "Moved " << agentsAtLocation[i][0].getId() << " to " << agentsAtLocation[i][0].getCurrentLocation() + 1 << std::endl;
 			}
 			else if (agentsAtLocation[i][0].getCurrentLocation() > agentsAtLocation[i][0].getTargetLocation()) {
-				agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() - 1);
+				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() - 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() - 1, agentsAtLocation[i][0].getCredit());
 				std::cout << "Moved " << agentsAtLocation[i][0].getId() << " to " << agentsAtLocation[i][0].getCurrentLocation() - 1 << std::endl;
+			}
+			else {
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " is at its target location" << std::endl;
 			}
 
 		}
@@ -151,7 +186,7 @@ int main() {
 		//}
 
 		// wait for a enter key press to continue
-		std::cin.get();
+		//std::cin.get();
 		std::cout << "==============================\n";
 	}
 
