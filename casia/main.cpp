@@ -12,96 +12,127 @@
 
 
 int generateRandom(int min, int max) {
-    return rand() % (max - min + 1) + min;
+	return rand() % (max - min + 1) + min;
 }
 
 // Function to initialize 10 agents with random starting and target locations
 void initAgents(Agent agents[], int numAgents) {
-    // Seed for random number generation
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	// Seed for random number generation
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    for (int i = 0; i < numAgents; ++i) {
-        int randomStart = generateRandom(1, 100);    // Random starting location between 1 and 100
-        int randomTarget = generateRandom(1, 100);   // Random target location between 1 and 100
-        //int randomCredit = generateRandom(50, 200);  // Random initial credit between 50 and 200
+	for (int i = 0; i < numAgents; ++i) {
+		int randomStart = generateRandom(0, 99);    // Random starting location between 0 and 99
+		int randomTarget = generateRandom(0, 99);   // Random target location between 0 and 99
+		//int randomCredit = generateRandom(50, 200);  // Random initial credit between 50 and 200
 
-        agents[i] = Agent(i + 1, randomStart, 0); // social credit is set to 0
-        agents[i].setTargetLocation(randomTarget);
-    }
+		agents[i] = Agent(i + 1, randomStart, 0); // social credit is set to 0
+		agents[i].setTargetLocation(randomTarget);
+		//agents[i].setCurrentLocation(randomStart);
+	}
 }
 
+void updateAgentById(Agent agents[], int numAgents, int id, int newLocation, int newCredit) {
+	for (int i = 0; i < numAgents; i++) {
+		if (agents[i].getId() == id) {
+			agents[i].setCurrentLocation(newLocation);
+			agents[i].setCredit(newCredit);
+			break;
+		}
+	}
+}
+
+
 void simulateIteration(Agent agents[], int numAgents) {
-    // Sort agents based on current location (ascending order)
-    std::sort(agents, agents + numAgents, [](const Agent& a, const Agent& b) {
-        return a.getCurrentLocation() < b.getCurrentLocation();
-        });
+
+	//Make a vector of vecotrs to store the agents that are at each location
+	std::vector<std::vector<Agent>> agentsAtLocation;
+
+	// fill the vector with the agents but put the agents in the same location in the same vector
+	for (int i = 0; i < MAP_SIZE; i++) {
+		std::vector<Agent> temp;
+		for (int j = 0; j < numAgents; j++) {
+			if (agents[j].getCurrentLocation() == i) {
+				temp.push_back(agents[j]);
+			}
+		}
+		agentsAtLocation.push_back(temp);
+	}
+
+	//print agentsAtLocation
+	for (int i = 0; i < agentsAtLocation.size(); i++) {
+		std::cout << "[" << i << "] : ";
+		for (int j = 0; j < agentsAtLocation[i].size(); j++) {
+			std::cout << "(" << agentsAtLocation[i][j].getId() << "|" << agentsAtLocation[i][j].getCredit() << "->" << agentsAtLocation[i][j].getTargetLocation() << ") ";
+		}
+		std::cout << std::endl;
+	}
+
+	// loop through the agentsAtlocation and if there is more than one agent at a location then they interact
+	for (int i = 0; i < agentsAtLocation.size(); i++) {
+		if (agentsAtLocation[i].size() > 1) {
+			// compare all of the agents in the location and which ever has the highest social credit moves closer to its target
+			int maxCredit = 0;
+			int maxCreditIndex = 0;
+			for (int j = 0; j < agentsAtLocation[i].size(); j++) {
+				if (agentsAtLocation[i][j].getCredit() > maxCredit) {
+					maxCredit = agentsAtLocation[i][j].getCredit();
+					maxCreditIndex = j;
+				}
+			}
 
 
-    // loop through agents and add all agents in the same location to a vector
-    for (int i = 0; i < numAgents; ++i) {
-        std::vector<Agent> agentsInSameLocation;
-        agentsInSameLocation.push_back(agents[i]);
-        for (int j = i + 1; j < numAgents; ++j) {
-            if (agents[j].getCurrentLocation() == agents[i].getCurrentLocation()) {
-                agentsInSameLocation.push_back(agents[j]);
-            }
-            else {
-                break;
-            }
+			// move the agent with the highest social credit closer to its target
+			if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() < agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
+				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1, agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " moved to " << agentsAtLocation[i][maxCreditIndex].getCurrentLocation() + 1 << std::endl;
+			}
+			else if (agentsAtLocation[i][maxCreditIndex].getCurrentLocation() > agentsAtLocation[i][maxCreditIndex].getTargetLocation()) {
+				//agentsAtLocation[i][maxCreditIndex].setCurrentLocation(agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1, agentsAtLocation[i][maxCreditIndex].getCredit() - 1);
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " moved to " << agentsAtLocation[i][maxCreditIndex].getCurrentLocation() - 1 << std::endl;
+			}
+			else {
+				std::cout << "Agent " << agentsAtLocation[i][maxCreditIndex].getId() << " is at its target location" << std::endl;
+				// update the credit score to 0
+				updateAgentById(agents, numAgents, agentsAtLocation[i][maxCreditIndex].getId(), agentsAtLocation[i][maxCreditIndex].getCurrentLocation(), 0);
+			}
 
+			// update the credit of the agents that are not moving
+			for (int j = 0; j < agentsAtLocation[i].size(); j++) {
+				if (j != maxCreditIndex) {
+					//agentsAtLocation[i][j].setCredit(agentsAtLocation[i][j].getCredit() - 1);
+					updateAgentById(agents, numAgents, agentsAtLocation[i][j].getId(), agentsAtLocation[i][j].getCurrentLocation(), agentsAtLocation[i][j].getCredit() + 1);
+					std::cout << "Agent " << agentsAtLocation[i][j].getId() << " is waiting" << std::endl;
+				}
+			}
 
+		}
+		else if (agentsAtLocation[i].size() == 1) {
+			// move the agent one step closer to the target
+			if (agentsAtLocation[i][0].getCurrentLocation() < agentsAtLocation[i][0].getTargetLocation()) {
+				
+				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() + 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() + 1, agentsAtLocation[i][0].getCredit());
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " moved to " << agentsAtLocation[i][0].getCurrentLocation() + 1 << std::endl;
+			}
+			else if (agentsAtLocation[i][0].getCurrentLocation() > agentsAtLocation[i][0].getTargetLocation()) {
+				//agentsAtLocation[i][0].setCurrentLocation(agentsAtLocation[i][0].getCurrentLocation() - 1);
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation() - 1, agentsAtLocation[i][0].getCredit());
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " moved to " << agentsAtLocation[i][0].getCurrentLocation() - 1 << std::endl;
+			}
+			else {
+				std::cout << "Agent " << agentsAtLocation[i][0].getId() << " is at its target location" << std::endl;
+				// update the credit score to 0	
+				updateAgentById(agents, numAgents, agentsAtLocation[i][0].getId(), agentsAtLocation[i][0].getCurrentLocation(), 0);
+			}
 
-        }
+		}
+		else {
+			// do nothing this is an empty location
+		}
+	}
 
-        // agentsInSameLocation.size() > 1
-        if (agentsInSameLocation.size() > 1) {
-            // If there are multiple agents in the same location determin which has the highest social credit score
-            int maxCredit = agentsInSameLocation[0].getCredit();
-            int maxCreditIndex = 0;
-            for (int k = 1; k < agentsInSameLocation.size(); k++) {
-                if (agentsInSameLocation[k].getCredit() > maxCredit) {
-                    maxCredit = agentsInSameLocation[k].getCredit();
-                    maxCreditIndex = k;
-                }
-            }
-
-     //       // Move the agent with the highest social credit score towards its target location
-     //       if (agentsInSameLocation[maxCreditIndex].getCurrentLocation() != agentsInSameLocation[maxCreditIndex].getTargetLocation()) {
-     //           if (agentsInSameLocation[maxCreditIndex].getTargetLocation() > agentsInSameLocation[maxCreditIndex].getCurrentLocation()) {
-					//agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() + 1);
-     //           }
-     //           else {
-     //               agentsInSameLocation[maxCreditIndex].setCurrentLocation(agentsInSameLocation[maxCreditIndex].getCurrentLocation() - 1);
-     //           }
-     //       }
-
-     //       // Update the social credit score of the agent that moved
-     //       //agentsInSameLocation[maxCreditIndex].setCredit(agentsInSameLocation[maxCreditIndex].getCredit() - 1);
-
-     //       // Update the social credit score of the other agents in the same location
-     //       for (int k = 0; k < agentsInSameLocation.size(); ++k) {
-     //           if (k != maxCreditIndex) {
-     //               agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() + 1); // Update the social credit score of the agent that did not move
-     //           }
-     //           else {
-     //               agentsInSameLocation[k].setCredit(agentsInSameLocation[k].getCredit() - 1); // Update the social credit score of the agent that moved
-     //           }
-     //       }
-
-
-        }  else {
-            // If there is only one agent in the location, move the agent towards its target location
-            if (agents[i].getCurrentLocation() != agents[i].getTargetLocation()) {
-                if (agents[i].getTargetLocation() > agents[i].getCurrentLocation()) {
-                    agents[i].setCurrentLocation(agents[i].getCurrentLocation() + 1);
-                }
-                else {
-                    agents[i].setCurrentLocation(agents[i].getCurrentLocation() - 1);
-                }
-            }
-        }
-
-    }
 
 
 }
@@ -110,55 +141,59 @@ void simulateIteration(Agent agents[], int numAgents) {
 
 
 int main() {
-    // Your code goes here
+	// Your code goes here
 
-    std::cout << "Hello, World!" << std::endl;
+	std::cout << "CASIA simulation begining..." << std::endl;
 
-    const int numAgents = 10;
-    int itterationCounter = 0;
-    //bool allAgentsAtTarget = false;
-    Agent agents[numAgents];
+	const int numAgents = 10;
+	int itterationCounter = 0;
+	//bool allAgentsAtTarget = false;
+	Agent agents[numAgents];
 
-    // Initialize agents
-    initAgents(agents, numAgents);
+	// Initialize agents
+	initAgents(agents, numAgents);
 
-    // Display information for each agent
-    for (int i = 0; i < numAgents; ++i) {
-        agents[i].displayInfo();
-        std::cout << "++++++++++++++++++++\n";
-    }
+	// Display information for each agent
+	for (int i = 0; i < numAgents; ++i) {
+		agents[i].displayInfo();
+		std::cout << "==============================\n";
+	}
 
-    bool allReachedTarget = false;
+	bool allReachedTarget = false;
 
-    // Main loop
-    while (!allReachedTarget) {
-        // Check if all agents reached their target locations
-        allReachedTarget = true;
-        for (int i = 0; i < numAgents; ++i) {
-            if (agents[i].getCurrentLocation() != agents[i].getTargetLocation()) {
-                allReachedTarget = false;
-                break;
-            }
-        }
+	// Main loop
+	while (!allReachedTarget) {
+		// Check if all agents reached their target locations
+		allReachedTarget = true;
+		for (int i = 0; i < numAgents; i++) {
+			if (agents[i].getCurrentLocation() != agents[i].getTargetLocation()) {
+				allReachedTarget = false;
+				break;
+			}
+		}
 
-        // End simulation if all agents reached their target locations
-        if (allReachedTarget) {
-            std::cout << "All agents reached their target locations. Simulation ends.\n";
-            break;
-        }
-        else {
-            itterationCounter++;
-            std::cout << "Not all agents reached their target locations. Simulation continues. Itteration:\n" << itterationCounter;
-            simulateIteration(agents, numAgents);
-        }
+		// End simulation if all agents reached their target locations
+		if (allReachedTarget) {
+			std::cout << "All agents reached their target locations. Simulation ends.\n";
+			break;
+		}
+		else {
+			itterationCounter++;
+			std::cout << "Not all agents reached their target locations. Simulation continues. Itteration: " << itterationCounter << "\n";
+			simulateIteration(agents, numAgents);
+		}
 
-        // Display information for each agent after the iteration
-        for (int i = 0; i < numAgents; ++i) {
-            agents[i].displayInfo();
-            std::cout << "----------------------\n";
-        }
-    }
+		// Display information for each agent after the iteration
+		//for (int i = 0; i < numAgents; ++i) {
+		//    agents[i].displayInfo();
+		//    std::cout << "==============================\n";
+		//}
+
+		// wait for a enter key press to continue
+		//std::cin.get();
+		std::cout << "==============================\n";
+	}
 
 
-    return 0;
+	return 0;
 }
